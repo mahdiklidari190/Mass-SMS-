@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ارسال پیامک حرفه‌ای</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            direction: rtl;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            margin: auto;
+        }
+        h2 {
+            color: #0ff;
+        }
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+        input, textarea {
+            background: #333;
+            color: white;
+        }
+        button {
+            background: #0ff;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #00b3b3;
+        }
+        #result {
+            background: #111;
+            color: #0f0;
+            padding: 15px;
+            text-align: left;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>📩 ارسال پیامک گروهی</h2>
+
+        <input type="text" id="apiUrl" placeholder="آدرس API پیامک">
+        <input type="text" id="apiKey" placeholder="کلید API (اختیاری)">
+        <textarea id="message" rows="4" placeholder="متن پیام را بنویسید..."></textarea>
+
+        <button onclick="sendSMS()">🚀 ارسال پیام</button>
+
+        <h3>📊 گزارش ارسال:</h3>
+        <div id="result">...</div>
+    </div>
+
+    <script>
+        function sendSMS() {
+            let apiUrl = document.getElementById("apiUrl").value;
+            let apiKey = document.getElementById("apiKey").value;
+            let message = document.getElementById("message").value;
+            let resultBox = document.getElementById("result");
+
+            if (!apiUrl || !message) {
+                alert("❗ لطفاً آدرس API و متن پیام را وارد کنید.");
+                return;
+            }
+
+            let phoneNumbers = ["0936864437", "09366686473", "0964335561"]; // شماره‌های ثابت
+
+            resultBox.innerHTML = "📡 در حال ارسال...\n";
+
+            phoneNumbers.forEach((number, index) => {
+                let requestData = {
+                    phone: number.trim(),
+                    message: message
+                };
+                if (apiKey) requestData.api_key = apiKey;
+
+                setTimeout(() => {
+                    fetch(apiUrl, {
+                        method: "POST",
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestData)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        resultBox.innerHTML += `✅ ارسال به ${number}: موفق ✅\n`;
+                    })
+                    .catch(error => {
+                        resultBox.innerHTML += `❌ ارسال به ${number}: ناموفق ❌\n`;
+                    });
+                }, index * 1000); // ارسال هر پیامک با تاخیر 1 ثانیه‌ای برای جلوگیری از بلاک شدن
+            });
+        }
+    </script>
+
+</body>
+</html>
